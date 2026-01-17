@@ -1,0 +1,13 @@
+Protein_ID,antigenicity_1,b_cells_probability_score,mhci_probability_score,mhci_rank,mhcii_rank,mhcii_score,surface_probability,ID,Prediction,OTHER,SP(Sec/SPI),LIPO(Sec/SPII),TAT(Tat/SPI),TATLIPO(Sec/SPII),PILIN(Sec/SPIII),CS Position,Epitope_Type,Epitope_Sequence,Thresholds
+P32722.1,1.003984,0.354758,0.7655,0.125,0.535,0.87985,1.000005,,,,,,,,,,,,
+,,,,,,,,P32722.1,SP,0.201834,0.793805,0.00176,0.000911,0.00069,0.000997,CS pos: 23-24. Pr: 0.7472,,,
+,,,,,,,,,,,,,,,,,mhci,TLDAHTFTL,
+,,,,,,,,,,,,,,,,,mhci,LIVDYPLSI,
+,,,,,,,,,,,,,,,,,mhcii,STQFAVADAFVSDQA,
+,,,,,,,,,,,,,,,,,mhcii,NTTWSLAAAYTLDAH,
+,,,,,,,,,,,,,,,,,mhcii,GSTQFAVADAFVSDQ,
+,,,,,,,,,,,,,,,,,mhcii,SNTTWSLAAAYTLDA,
+,,,,,,,,,,,,,,,,,,,"Threshold for strong ""MHC Class I"" binder: % Rank = Lower than 0.5"
+,,,,,,,,,,,,,,,,,,,"Threshold for strong ""MHC Class II"" binder: % Rank = Lower than 1"
+,,,,,,,,,,,,,,,,,,,"Threshold for strong ""B cell epitope"": Score = Greater than 0.5"
+,,,,,,,,,,,,,,,,,,,Antigenicity = Value close to 1 or Greater than 1 indicates high antigenicity

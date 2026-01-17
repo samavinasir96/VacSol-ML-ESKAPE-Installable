@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vacsol-ml"
+version = "1.0.5"
+description = "VacSol-ML (ESKAPE): ML-driven vaccine target discovery targeting ESKAPE pathogens"
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.10,<3.13"
+
+dependencies = [
+    "Django==5.2.10",
+    "django-mathfilters==1.0.0",
+    "iedb==0.0.2",
+    "joblib==1.5.3",
+    "numpy==2.2.6",
+    "pandas==2.3.3",
+    "pybiolib==1.2.1768",
+    "scikit-learn==1.4.2",
+    "tensorflow==2.20.0",
+    "keras==3.12.0",
+    "bio==1.8.1",
+]
+
+[tool.setuptools]
+include-package-data = true
+
+[project.scripts]
+vacsol-ml = "vacsol_ml.cli:main"

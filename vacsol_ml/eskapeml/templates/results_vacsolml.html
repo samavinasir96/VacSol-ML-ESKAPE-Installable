@@ -1,0 +1,571 @@
+﻿{% extends './base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- Source Sans Pro -->
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --primary: #104378;
+        --primary-dark: #04304a;
+        --primary-soft: #e9f0f4;
+        --success: #2e7d32;
+        --warning: #f9a825;
+        --danger: #c62828;
+        --text-main: #263238;
+        --text-muted: #607d8b;
+        --bg: #f8f9fa;
+        --white: #ffffff;
+    }
+
+    body {
+        font-family: 'Source Sans Pro',sans-serif;
+        background: var(--bg);
+        color: #263238;
+    }
+
+    .main-container {
+        max-width: 1300px;
+        margin: 0 auto;
+        padding: 30px 20px;
+    }
+
+    .description-container {
+        margin-bottom: 30px;
+    }
+
+    .description p {
+        font-size: 16px;
+        line-height: 1.75;
+        max-width: 900px;
+    }
+
+    .highlight {
+        font-weight: 700;
+        color: #263238;
+    }
+
+    .section-heading {
+        text-align: center;
+        background: var(--primary-soft);
+        color: var(--primary);
+        padding: 14px 20px;
+        border-radius: 8px;
+        font-weight: 800;
+        font-size: 18px;
+        letter-spacing: .3px;
+        margin: 35px 0 20px;
+    }
+
+    .results-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--white);
+        border-radius: 8px;
+        box-shadow: 0 6px 18px rgba(0,0,0,.06);
+    }
+
+        .results-table th,
+        .results-table td {
+            text-align: left;
+            padding: 14px 18px;
+            font-size: 15px;
+        }
+
+        .results-table th {
+            background: #104378;
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .results-table tr:nth-child(even) {
+            background: #f7fafc;
+        }
+
+        .results-table tr:hover {
+            background: #eef6fb;
+        }
+
+    .vaccine-candidate {
+        color: var(--success);
+        font-weight: 700;
+    }
+
+    .non-vaccine-candidate {
+        color: var(--danger);
+        font-weight: 700;
+    }
+
+    .confidence-bar-container {
+        width: 100%;
+        background: #e0e0e0;
+        border-radius: 10px;
+        height: 18px;
+        position: relative;
+    }
+
+    .confidence-bar {
+        height: 100%;
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #fff;
+        text-align: right;
+        padding-right: 6px;
+        line-height: 18px;
+    }
+
+    .conf-low {
+        background: linear-gradient(90deg,#c62828,#e57373);
+    }
+
+    .conf-mid {
+        background: linear-gradient(90deg,#f9a825,#ffd54f);
+        color: #000;
+    }
+
+    .conf-high {
+        background: linear-gradient(90deg,#2e7d32,#81c784);
+    }
+
+    .tooltip {
+        position: relative;
+        cursor: help;
+        display: inline-block;
+    }
+
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 130%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #263238;
+            color: #fff;
+            font-size: 13px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: .2s ease;
+            z-index: 2147483647;
+        }
+
+        .tooltip:hover::after {
+            opacity: 1;
+        }
+
+    .button-container {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin: 35px 0;
+        flex-wrap: wrap;
+    }
+
+    .button {
+        background: #1e3a8a;
+        color: #fff;
+        padding: 12px 22px;
+        border-radius: 8px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: .25s ease;
+        font-family: 'Source Sans Pro', sans-serif;
+    }
+
+    .button:hover {
+        background: #1e3a8a;
+    }
+
+    .button.secondary {
+        background: #238EDE;
+        color: #fff;
+    }
+
+    .button.secondary:hover {
+        background: #104378;
+    }
+
+    @media(max-width:768px) {
+        .results-table {
+            display: block;
+            overflow-x: auto;
+        }
+    }
+
+    .results-layout {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 25px;
+        align-items: start;
+    }
+
+    .results-table-wrapper {
+        overflow-x: auto;
+    }
+
+    .results-table-wrapper,
+    .results-table,
+    tbody, tr, td, th {
+        overflow: visible !important;
+        position: static; /* Helps break some stacking issues */
+    }
+
+    .confidence-legend {
+        background: #f8f9fa;
+        border-left: 5px solid #104378;
+        padding: 18px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+
+    .confidence-legend h4 {
+        margin-bottom: 12px;
+        color: #104378;
+        font-weight: 800;
+    }
+
+    .legend-item {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+        align-items: center;
+    }
+
+    .legend-box {
+        width: 26px;
+        height: 12px;
+        border-radius: 6px;
+        display: inline-block;
+    }
+
+    .legend-note {
+        margin-top: 12px;
+        font-size: 13px;
+        color: #607d8b;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .results-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .confidence-legend {
+            margin-top: 20px;
+        }
+    }
+
+    .cite-btn {
+        background: #2e7d32;
+    }
+
+    .cite-btn:hover {
+        background: #1b5e20;
+    }
+
+    /* Modal */
+    .cite-modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.55);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .cite-modal-content {
+        background: #fff;
+        max-width: 560px;
+        width: 92%;
+        padding: 28px 32px;
+        border-radius: 10px;
+        position: relative;
+        box-shadow: 0 15px 45px rgba(0,0,0,.25);
+    }
+
+        .cite-modal-content h3 {
+            margin-bottom: 14px;
+            color: #104378;
+            font-weight: 800;
+        }
+
+    .cite-text {
+        font-size: 15px;
+        line-height: 1.65;
+        background: #f4f6f8;
+        padding: 16px;
+        border-radius: 6px;
+        margin-bottom: 18px;
+    }
+
+    .cite-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .cite-close {
+        position: absolute;
+        top: 12px;
+        right: 16px;
+        font-size: 26px;
+        cursor: pointer;
+        color: #607d8b;
+    }
+</style>
+
+<div class="main-container">
+
+    <div class="description-container" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+        <p style="flex: 1; min-width: 250px;">
+            <span class="highlight">VacSol-ML (ESKAPE)</span> analysis results for your submitted protein sequences.
+            Below are predicted vaccine candidates along with model confidence scores.
+        </p>
+
+        <a class="button cite-btn" onclick="openCiteModal()"
+           style="padding: 10px 18px; font-size: 14px; white-space: nowrap; flex-shrink: 0;">
+            Cite VacSol-ML
+        </a>
+    </div>
+
+    <div class="section-heading">Prediction Results</div>
+    <div class="results-layout">
+
+        <!-- RESULTS TABLE -->
+        <div class="results-table-wrapper">
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Protein ID</th>
+                        <th>Prediction</th>
+                        <th>
+                            <span class="tooltip" data-tooltip="Model confidence for predicted class">
+                                Confidence ⓘ
+                            </span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in eskapeml_results %}
+                    <tr>
+                        <td>{{ result.Protein_ID }}</td>
+                        <td>
+                            {% if result.Prediction == 1 %}
+                            {% if result.Confidence_percent < 50 %}
+                            <span class="vaccine-candidate">Vaccine Candidate (Low Confidence)</span>
+                            {% else %}
+                            <span class="vaccine-candidate">Potential Vaccine Candidate</span>
+                            {% endif %}
+                            {% else %}
+                            <span class="non-vaccine-candidate">Non-Vaccine Candidate</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="confidence-bar-container">
+                                <div class="confidence-bar {% if result.Confidence_percent < 50 %}conf-mid{% elif result.Prediction == 1 %}conf-high{% else %}conf-low{% endif %}"
+                                     style="width:{{ result.Confidence_percent }}%">
+                                    {{ result.Confidence_percent|floatformat:1 }}%
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- CONFIDENCE LEGEND -->
+        <aside class="confidence-legend">
+            <h4>Confidence Interpretation</h4>
+
+            <div class="legend-item">
+                <span class="legend-box conf-high"></span>
+                <span><strong>Green (long bar)</strong><br>High-confidence vaccine candidate</span>
+            </div>
+
+            <div class="legend-item">
+                <span class="legend-box conf-low"></span>
+                <span><strong>Red (long bar)</strong><br>High-confidence non-vaccine protein</span>
+            </div>
+
+            <div class="legend-item">
+                <span class="legend-box conf-mid"></span>
+                <span><strong>Yellow (short bar)</strong><br>Low model confidence </span>
+            </div>
+
+            <p class="legend-note">
+                Bar length represents model confidence in the predicted class.
+            </p>
+        </aside>
+
+    </div>
+
+    <div class="button-container download-main" style="margin-bottom: 20px; justify-content: center; gap: 18px;">
+        <a class="button secondary" href="{% url 'eskapeml:eskapeml_download_csv' %}" style="padding: 14px 24px; font-size: 15px;">
+            Download Predictions
+        </a>
+        <a class="button secondary" href="{% url 'eskapeml:download_biological' %}" style="padding: 14px 24px; font-size: 15px;">
+            Biological Properties
+        </a>
+        <a class="button secondary" href="{% url 'eskapeml:download_physiochemical' %}" style="padding: 14px 24px; font-size: 15px;">
+            Descriptors by iFeature
+        </a>
+    </div>
+
+    <form action="{% url 'eskapeml:clear_temp' %}" method="post" style="text-align: center;">
+        {% csrf_token %}
+        <button class="button secondary" type="submit"
+                style="padding: 14px 24px; background-color: #c62828; color: white; border: none; cursor: pointer; font-weight: 700; font-size: 15px;">
+            Close Analysis & Go Home
+        </button>
+    </form>
+</div>
+    <!-- =========================
+     CITE MODAL (NEW)
+     ========================= -->
+<div id="citeModal" class="cite-modal">
+    <div class="cite-modal-content">
+        <h3>How to Cite VacSol-ML</h3>
+
+        <p class="cite-text" id="citationText">
+            Samavi Nasir, Farha Anwer, Zaara Ishaq, Muhammad Tariq Saeed, Amjad Ali,
+            VacSol-ML(ESKAPE): Machine learning empowering vaccine antigen prediction for ESKAPE pathogens,
+            Vaccine,
+            Volume 42, Issue 22,
+            2024,
+            126204,
+            ISSN 0264-410X,
+            https://doi.org/10.1016/j.vaccine.2024.126204.
+            (https://www.sciencedirect.com/science/article/pii/S0264410X24008867)
+        </p>
+
+        <div class="cite-actions">
+            <button class="button secondary" onclick="copyCitation()">Copy Citation</button>
+            <button class="button secondary" onclick="downloadBibTeX()">BibTeX</button>
+            <button class="button secondary" onclick="downloadRIS()">RIS</button>
+            <a class="button" href="https://doi.org/10.1016/j.vaccine.2024.126204" target="_blank">
+                View Paper
+            </a>
+        </div>
+
+        <span class="cite-close" onclick="closeCiteModal()">×</span>
+    </div>
+</div>
+
+<!-- =========================
+     JAVASCRIPT (NEW)
+     ========================= -->
+<script>
+    /* ---- Analytics Hook ---- */
+    function trackCitation(action) {
+        /* Google Analytics */
+        if (window.gtag) {
+            gtag('event', action, {
+                event_category: 'Citation',
+                event_label: 'VacSol-ML'
+            });
+        }
+
+        /* Plausible */
+        if (window.plausible) {
+            plausible(action);
+        }
+
+        /* Optional backend logging */
+        fetch('/log-citation/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: action })
+        }).catch(() => { });
+    }
+
+    /* ---- Modal Controls ---- */
+    function openCiteModal() {
+        document.getElementById("citeModal").style.display = "flex";
+        trackCitation('open_citation_modal');
+    }
+
+    function closeCiteModal() {
+        document.getElementById("citeModal").style.display = "none";
+    }
+
+    /* ---- Copy Citation ---- */
+    function copyCitation() {
+        const text = document.getElementById("citationText").innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            trackCitation('copy_citation');
+            alert("Citation copied to clipboard!");
+        });
+    }
+
+    /* ---- BibTeX ---- */
+    function downloadBibTeX() {
+        trackCitation('download_bibtex');
+        const bibtex = `@article{NASIR2024126204,
+title = {VacSol-ML(ESKAPE): Machine learning empowering vaccine antigen prediction for ESKAPE pathogens},
+journal = {Vaccine},
+volume = {42},
+number = {22},
+pages = {126204},
+year = {2024},
+issn = {0264-410X},
+doi = {https://doi.org/10.1016/j.vaccine.2024.126204},
+url = {https://www.sciencedirect.com/science/article/pii/S0264410X24008867},
+author = {Samavi Nasir and Farha Anwer and Zaara Ishaq and Muhammad Tariq Saeed and Amjad Ali},
+keywords = {Reverse vaccinology, ML, AI, Supervised machine learning, ESAKPE, Antigens, Bacteria, Vaccine},
+abstract = {The ESKAPE family, comprising Enterococcus faecium, Staphylococcus aureus, Klebsiella pneumoniae, Acinetobacter baumannii, Pseudomonas aeruginosa, and Enterobacter spp., poses a significant global threat due to their heightened virulence and extensive antibiotic resistance. These pathogens contribute largely to the prevalence of nosocomial or hospital-acquired infections, resulting in high morbidity and mortality rates. To tackle this healthcare problem urgent measures are needed, including development of innovative vaccines and therapeutic strategies. Designing vaccines involves a complex and resource-intensive process of identifying protective antigens and potential vaccine candidates (PVCs) from pathogens. Reverse vaccinology (RV), an approach based on genomics, made this process more efficient by leveraging bioinformatics tools to identify potential vaccine candidates. In recent years, artificial intelligence and machine learning (ML) techniques has shown promise in enhancing the accuracy and efficiency of reverse vaccinology. This study introduces a supervised ML classification framework, to predict potential vaccine candidates specifically against ESKAPE pathogens. The model's training utilized biological and physicochemical properties from a dataset containing protective antigens and non-protective proteins of ESKAPE pathogens. Conventional autoencoders based strategy was employed for feature encoding and selection. During the training process, seven machine learning algorithms were trained and subjected to Stratified 5-fold Cross Validation. Random Forest and Logistic Regression exhibited best performance in various metrics including accuracy, precision, recall, WF1 score, and Area under the curve. An ensemble model was developed, to take collective strengths of both the algorithms. To assess efficacy of our final ensemble model, a high-quality benchmark dataset was employed. VacSol-ML(ESKAPE) demonstrated outstanding discrimination between protective vaccine candidates (PVCs) and non-protective antigens. VacSol-ML(ESKAPE), proves to be an invaluable tool in expediting vaccine development for these pathogens. Accessible to the public through both a web server and standalone version, it encourages collaborative research. The web-based and standalone tools are available at http://vacsolml.mgbio.tech/.}
+}`;
+        downloadFile(bibtex, 'VacSol-ML.bib', 'text/plain');
+    }
+
+    /* ---- RIS ---- */
+    function downloadRIS() {
+        trackCitation('download_ris');
+        const ris = `TY  - JOUR
+T1  - VacSol-ML(ESKAPE): Machine learning empowering vaccine antigen prediction for ESKAPE pathogens
+AU  - Nasir, Samavi
+AU  - Anwer, Farha
+AU  - Ishaq, Zaara
+AU  - Saeed, Muhammad Tariq
+AU  - Ali, Amjad
+JO  - Vaccine
+VL  - 42
+IS  - 22
+SP  - 126204
+PY  - 2024
+DA  - 2024/09/17/
+SN  - 0264-410X
+DO  - https://doi.org/10.1016/j.vaccine.2024.126204
+UR  - https://www.sciencedirect.com/science/article/pii/S0264410X24008867
+KW  - Reverse vaccinology
+KW  - ML
+KW  - AI
+KW  - Supervised machine learning
+KW  - ESAKPE
+KW  - Antigens
+KW  - Bacteria
+KW  - Vaccine
+AB  - The ESKAPE family, comprising Enterococcus faecium, Staphylococcus aureus, Klebsiella pneumoniae, Acinetobacter baumannii, Pseudomonas aeruginosa, and Enterobacter spp., poses a significant global threat due to their heightened virulence and extensive antibiotic resistance. These pathogens contribute largely to the prevalence of nosocomial or hospital-acquired infections, resulting in high morbidity and mortality rates. To tackle this healthcare problem urgent measures are needed, including development of innovative vaccines and therapeutic strategies. Designing vaccines involves a complex and resource-intensive process of identifying protective antigens and potential vaccine candidates (PVCs) from pathogens. Reverse vaccinology (RV), an approach based on genomics, made this process more efficient by leveraging bioinformatics tools to identify potential vaccine candidates. In recent years, artificial intelligence and machine learning (ML) techniques has shown promise in enhancing the accuracy and efficiency of reverse vaccinology. This study introduces a supervised ML classification framework, to predict potential vaccine candidates specifically against ESKAPE pathogens. The model's training utilized biological and physicochemical properties from a dataset containing protective antigens and non-protective proteins of ESKAPE pathogens. Conventional autoencoders based strategy was employed for feature encoding and selection. During the training process, seven machine learning algorithms were trained and subjected to Stratified 5-fold Cross Validation. Random Forest and Logistic Regression exhibited best performance in various metrics including accuracy, precision, recall, WF1 score, and Area under the curve. An ensemble model was developed, to take collective strengths of both the algorithms. To assess efficacy of our final ensemble model, a high-quality benchmark dataset was employed. VacSol-ML(ESKAPE) demonstrated outstanding discrimination between protective vaccine candidates (PVCs) and non-protective antigens. VacSol-ML(ESKAPE), proves to be an invaluable tool in expediting vaccine development for these pathogens. Accessible to the public through both a web server and standalone version, it encourages collaborative research. The web-based and standalone tools are available at http://vacsolml.mgbio.tech/.
+ER  - `;
+        downloadFile(ris, 'VacSol-ML.ris', 'application/x-research-info-systems');
+    }
+
+    /* ---- Utility ---- */
+    function downloadFile(content, filename, type) {
+        const blob = new Blob([content], { type: type });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+</script>
+
+{% endblock %}

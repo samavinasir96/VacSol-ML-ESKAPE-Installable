@@ -1,0 +1,171 @@
+﻿{% extends './base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- Source Sans Pro -->
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --primary: #104378;
+        --primary-dark: #04304a;
+        --primary-soft: #e9f0f4;
+        --success: #2e7d32;
+        --warning: #f9a825;
+        --danger: #c62828;
+        --text-main: #263238;
+        --text-muted: #607d8b;
+        --bg: #f8f9fa;
+        --white: #ffffff;
+    }
+
+    body {
+        font-family: 'Source Sans Pro', sans-serif;
+        background: var(--bg);
+        color: var(--text-main);
+    }
+
+    .main-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 30px 20px;
+    }
+
+    .section-heading {
+        text-align: center;
+        background: var(--primary-soft);
+        color: var(--primary);
+        padding: 14px 20px;
+        border-radius: 8px;
+        font-weight: 800;
+        font-size: 18px;
+        letter-spacing: .3px;
+        margin-bottom: 30px;
+    }
+
+    .card {
+        background: var(--white);
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    }
+
+    .status-message {
+        text-align: center;
+        font-weight: 600;
+        font-size: 1.2em;
+        margin-bottom: 20px;
+    }
+
+    .progress-container {
+        margin: 20px 0;
+    }
+
+    .progress-bar {
+        height: 24px;
+        background-color: #e0e0e0;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        width: 0%;
+        background-color: var(--primary);
+        border-radius: 12px;
+        text-align: right;
+        color: #fff;
+        font-weight: 700;
+        line-height: 24px;
+        padding-right: 8px;
+        transition: width 0.4s ease;
+    }
+
+    .progress-text {
+        text-align: center;
+        font-weight: 700;
+        margin-top: 10px;
+    }
+
+    .log-section {
+        margin-top: 30px;
+    }
+
+        .log-section label {
+            font-weight: 700;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+    .log-box {
+        border: 1px solid #ddd;
+        padding: 15px;
+        height: 300px;
+        overflow-y: auto;
+        background-color: #f9f9f9;
+        font-family: monospace;
+        border-radius: 6px;
+    }
+
+        .log-box div {
+            margin-bottom: 6px;
+        }
+
+    @media(max-width:768px) {
+        .progress-fill {
+            font-size: 12px;
+            line-height: 20px;
+        }
+    }
+</style>
+
+<div class="main-container">
+
+    <div class="section-heading">Processing Your Sequences</div>
+
+    <div class="card">
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill">0%</div>
+            </div>
+        </div>
+
+        <div class="log-section">
+            <label>Progress Log</label>
+            <div class="log-box" id="log-messages">
+                <div>✔ Upload started</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+    function updateProgress() {
+        $.get("{% url 'eskapeml:get_progress' %}", function (data) {
+            $("#progress-fill").css("width", data.progress + "%");
+            $("#progress-fill").text(data.progress + "%");
+            $("#progress-text").text(data.progress + "% Done");
+
+            $("#log-messages").html("");
+            data.logs.forEach(log => {
+                $("#log-messages").append("<div>✔ " + log + "</div>");
+            });
+
+            if (data.progress < 100) {
+                setTimeout(updateProgress, 1000);
+            } else {
+                $("#status-message").text("Completed!");
+                setTimeout(() => {
+                    window.location.href = "{% url 'eskapeml:results' %}";
+                }, 1500);
+            }
+        });
+    }
+
+    $(document).ready(updateProgress);
+</script>
+
+{% endblock %}

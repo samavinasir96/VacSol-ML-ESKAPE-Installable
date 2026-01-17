@@ -1,0 +1,132 @@
+{% extends './base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- Source Sans Pro -->
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --primary: #05445E;
+        --primary-hover: #04304a;
+        --card-bg: #ffffff;
+        --card-border: #2C7DA0;
+        --text-main: #263238;
+        --text-muted: #607d8b;
+        --bg: #f8f9fa;
+    }
+
+    body {
+        font-family: 'Source Sans Pro', sans-serif;
+        background-color: var(--bg);
+        color: var(--text-main);
+        margin: 0;
+        padding: 0;
+    }
+
+    .card-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 30px;
+        justify-content: center;
+        padding: 40px 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .card {
+        background-color: var(--card-bg);
+        border-left: 6px solid #104378;
+        padding: 30px 25px;
+        border-radius: 8px;
+        flex: 1 1 320px;
+        min-width: 300px;
+        max-width: 100%;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+        }
+
+    .card-logo {
+        height: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+        .card-logo img {
+            max-height: 250%;
+            width: auto;
+            display: block;
+        }
+
+    .card p {
+        margin-bottom: 25px;
+        line-height: 1.75;
+        font-size: 16px;
+        color: var(--text-main);
+    }
+
+    .highlight {
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    .go-link {
+        display: inline-block;
+        background-color: #104378;
+        color: #fff;
+        padding: 12px 28px;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 15px;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+        .go-link:hover {
+            background-color: #238EDE;
+            transform: translateY(-2px);
+        }
+
+    @media (max-width: 768px) {
+        .card-container {
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 10px;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 100%;
+        }
+    }
+</style>
+
+<div class="card-container">
+
+    <div class="card">
+        <div class="card-logo">
+            <img src="{% static '1.png' %}" alt="VacSol-ML(ESKAPE)">
+        </div>
+        <p>
+            <span class="highlight">VacSol-ML(ESKAPE)</span> is an open-source,
+            <span class="highlight">reverse vaccinology pipeline</span>, powered by
+            <span class="highlight">advanced machine learning algorithms</span> to streamline
+            the identification and evaluation of <span class="highlight">vaccine immunogens</span>
+            targeting <span class="highlight">ESKAPE</span> pathogens.
+            VacSol-ML's ensemble model expertly analyzes <span class="highlight">protein sequence data</span>,
+            providing actionable insights for targeted vaccine development.
+        </p>
+        <a href="{% url 'eskapeml:upload_sequence' %}" class="go-link">Go to VacSol-ML(ESKAPE)</a>
+    </div>
+
+</div>
+
+{% endblock %}

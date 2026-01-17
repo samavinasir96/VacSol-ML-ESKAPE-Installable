@@ -1,0 +1,24 @@
+include README.md
+include pyproject.toml
+include requirements.txt
+
+recursive-include vacsol_ml/eskapeml/templates *
+recursive-include vacsol_ml/eskapeml/static *
+
+recursive-include vacsol_ml/eskapeml *.pkl
+recursive-include vacsol_ml/eskapeml *.keras
+recursive-include vacsol_ml/eskapeml *.csv
+recursive-include vacsol_ml/eskapeml *.tsv
+recursive-include vacsol_ml/eskapeml *.fasta
+recursive-include vacsol_ml/eskapeml *.txt
+recursive-include vacsol_ml/eskapeml *.log
+
+recursive-include vacsol_ml/eskapeml/Temp_Results *
+recursive-include vacsol_ml/eskapeml/Analysis_Results *
+
+recursive-include vacsol_ml/Data/iFeature *
+recursive-include vacsol_ml/eskapeml/signalP *
+
+global-exclude __pycache__
+global-exclude *.py[cod]
+global-exclude *.DS_Store

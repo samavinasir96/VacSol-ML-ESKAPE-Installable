@@ -1,0 +1,161 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}VacSol-ML{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f9fafb;
+            --card: #ffffff;
+            --text: #374151;
+            --muted: #6b7280;
+            --accent: #2563eb;
+            --border: #e5e7eb;
+            --shadow: 0 6px 20px rgba(0,0,0,.06);
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Source Sans Pro', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.65;
+        }
+
+        /* ===== HERO HEADER ===== */
+        .topbar {
+            background: #104378; /* solid dark blue */
+            height: 72px;
+            display: flex;
+            align-items: center;
+        }
+
+        .topbar-inner {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* BRAND */
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #ffffff;
+            font-size: 1.35rem;
+            font-weight: 700;
+        }
+
+        .brand img {
+            height: 250px; /* fixed logo height */
+            width: auto;
+            padding-top: 10px;
+        }
+
+        /* GITHUB BUTTON */
+        .github-btn {
+            background: #238EDE;
+            padding: 0.45rem 0.9rem;
+            border-radius: 8px;
+            color: #ffffff !important;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .github-btn:hover {
+            background: #2563eb;
+        }
+
+        /* NAV */
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            text-decoration: none;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        .topbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .topbar-nav a {
+            color: #e5e7eb;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .topbar-nav a:hover {
+            color: #ffffff;
+        }
+
+        /* MAIN */
+        main {
+                padding: 10px 20px;
+            }
+
+        /* FOOTER */
+        footer {
+            text-align: center;
+            padding: 3rem 1rem;
+            font-size: .9rem;
+            color: var(--muted);
+            border-top: 1px solid var(--border);
+        }
+
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header class="topbar">
+        <div class="topbar-inner">
+            <div class="brand">
+                <img src="{% static '2.png' %}" alt="VacSol-ML Logo">
+            </div>
+
+            <nav class="topbar-nav">
+                <a href="https://samavinasir96.github.io/vacsol-ml-datasets/">Dataset</a>
+                <a href="https://doi.org/10.1016/j.vaccine.2024.126204">Publication</a>
+                <a href="https://github.com/samavinasir96/vacsol-ml-datasets"
+                   target="_blank"
+                   class="github-btn">
+                    GitHub Repo
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        {% block content %}
+        <!-- Content will be overridden in child templates -->
+        {% endblock %}
+    </main>
+
+    <footer>
+        &copy; 2026 Microbial Genomics & Bioinformatics <br> • Integrative Biology Laboratory, Atta-ur-Rahman School of Applied Biosciences (ASAB)
+        • National University of Sciences and Technology (NUST) Islamabad.
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

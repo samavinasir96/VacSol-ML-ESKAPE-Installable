@@ -1,0 +1,226 @@
+﻿{% extends './base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- Source Sans Pro -->
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --primary: #104378;
+        --primary-dark: #04304a;
+        --primary-soft: #e9f0f4;
+        --success: #2e7d32;
+        --warning: #f9a825;
+        --danger: #c62828;
+        --text-main: #263238;
+        --text-muted: #607d8b;
+        --bg: #f8f9fa;
+        --white: #ffffff;
+    }
+
+    body {
+        font-family: 'Source Sans Pro', sans-serif;
+        background: var(--bg);
+        color: var(--text-main);
+    }
+
+    .main-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px 20px;
+    }
+
+    .description-container {
+        margin-bottom: 30px;
+    }
+
+    .description p {
+        font-size: 16px;
+        line-height: 1.75;
+        max-width: 900px;
+    }
+
+    .highlight {
+        font-weight: 700;
+        color: var(--primary-dark);
+    }
+
+    .section-heading {
+        text-align: center;
+        background: var(--primary-soft);
+        color: var(--primary);
+        padding: 14px 20px;
+        border-radius: 8px;
+        font-weight: 800;
+        font-size: 18px;
+        letter-spacing: .3px;
+        margin: 35px 0 20px;
+    }
+
+    form {
+        background: var(--white);
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 700;
+    }
+
+    select, textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-family: monospace;
+        font-size: 14px;
+        transition: border-color 0.2s ease;
+    }
+
+        select:focus, textarea:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+    .example-link {
+        color: var(--primary);
+        text-decoration: underline;
+        cursor: pointer;
+        display: inline-block;
+        margin-top: 5px;
+    }
+
+    .button {
+        background: var(--primary);
+        color: var(--white);
+        border: none;
+        padding: 12px 22px;
+        border-radius: 8px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: .25s ease;
+        margin-top: 10px;
+    }
+
+        .button:hover {
+            background: #238EDE;
+        }
+
+    .progress-content {
+        display: none;
+        margin-top: 30px;
+    }
+
+    .status-message {
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+
+    .progress-container {
+        margin: 20px 0;
+    }
+
+    .progress-bar {
+        height: 20px;
+        background-color: #e0e0e0;
+        border-radius: 6px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        width: 0%;
+        background-color: var(--primary);
+        transition: width 0.3s ease;
+    }
+
+    .progress-text {
+        text-align: center;
+        font-weight: 600;
+        margin-top: 5px;
+    }
+
+    .log-box {
+        border: 1px solid #ddd;
+        padding: 15px;
+        height: 200px;
+        overflow-y: auto;
+        background-color: #f9f9f9;
+        font-family: monospace;
+        margin-top: 15px;
+        border-radius: 6px;
+    }
+
+    @media(max-width:768px) {
+        .form-container {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="main-container">
+
+    <div class="description-container">
+        <p>
+            Submit your protein sequences for <span class="highlight">VacSol-ML (ESKAPE)</span> analysis.
+        </p>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" id="upload-form">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="pathogen">Select Pathogen:</label>
+            <select name="pathogen" id="pathogen" required>
+                <option value="Enterococcus faecium">Enterococcus faecium</option>
+                <option value="Staphylococcus aureus">Staphylococcus aureus</option>
+                <option value="Klebsiella pneumoniae">Klebsiella pneumoniae</option>
+                <option value="Acinetobacter baumannii">Acinetobacter baumannii</option>
+                <option value="Pseudomonas aeruginosa">Pseudomonas aeruginosa</option>
+                <option value="Enterobacter">Enterobacter</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="sequence-textarea">Protein FASTA Sequences</label>
+            <a class="example-link" onclick="copyExampleSequence()">Example Sequence</a>
+            <textarea id="sequence-textarea" name="sequence" required
+                      placeholder=">P32722.1&#10;MKVMKWSAIALAVSAGSTQFAVADAFVSDQAEAKGFIEDSSLDLLLRNYYFNRDGKSGSGDRVDWT..."></textarea>
+        </div>
+
+        <button type="submit" class="button">Analyze Sequence(s)</button>
+    </form>
+
+    <div id="progress-section" class="progress-content">
+        <div class="section-heading">Processing Your Sequences</div>
+
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="progress-text" id="progress-text">0% Done</div>
+        </div>
+
+        <div class="log-box" id="log-messages"></div>
+    </div>
+
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+    function copyExampleSequence() {
+        var exampleFastaIdentifier = ">P32722.1";
+        var exampleSequence = "MKVMKWSAIALAVSAGSTQFAVADAFVSDQAEAKGFIEDSSLDLLLRNYYFNRDGKSGSGDRVDWTQGFLTTYESGFTQGTVGFGVDAFGYLGLKLDGTSDKTGTGNLPVMNDGKPRDDYSRAGGAVKVRISKTMLKWGEMQPTAPVFAAGGSRLFPQTATGFQLQSSEFEGLDLEAGHFTEGKEPTTVKSRGELYATYAGETAKSADFIGGRYAITDNLSASLYGAELEDIYRQYYLNSNYTIPLASDQSLGFDFNIYRTNDEGKAKAGDISNTTWSLAAAYTLDAHTFTLAYQKVHGDQPFDYIGFGRNGSGAGGDSIFLANSVQYSDFNGPGEKSWQARYDLNLASYGVPGLTFMVRYINGKDIDGTKMSDNNVGYKNYGYGEDGKHHETNLEAKYVVQSGPAKDLSFRIRQAWHRANADQGEGDQNEFRLIVDYPLSIL";
+        document.getElementById('sequence-textarea').value = exampleFastaIdentifier + "\n" + exampleSequence;
+    }
+</script>
+
+{% endblock %}
